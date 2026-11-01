@@ -1,0 +1,24 @@
+# 依存・ビルド成果物
+node_modules/
+dist/
+test-results/
+playwright-report/
+.vite/
+
+# Claude Code の作業用ディレクトリ
+.claude/
+
+# 実データの誤コミット防止（メール・パスワードマネージャのエクスポート・出力結果）
+# テストには tests/fixtures/ の合成データだけを使うこと
+*.mbox
+*.eml
+*.csv
+*.zip
+*.tgz
+account-audit-*.json
+!tests/fixtures/*.mbox
+!tests/fixtures/*.csv
+
+# OS
+.DS_Store
+Thumbs.db

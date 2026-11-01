@@ -1,0 +1,62 @@
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: =?UTF-8?B?44K144Oz44OX44Or5ZWG5bqX?= <noreply@mail.example.co.jp>
+Subject: =?UTF-8?B?44CQ44K144Oz44OX44Or5ZWG5bqX44CR5Lya5ZOh55m76Yyy44GM5a6M5LqG44GX44G+44GX44Gf?=
+Date: Mon, 03 Feb 2020 10:00:00 +0900
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: Sample Shop <info@example.co.jp>
+Subject: =?UTF-8?B?44GU5rOo5paH44Gu56K66KqN?=
+Date: Tue, 01 Jun 2021 12:00:00 +0900
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: News <news@example.com>
+Subject: Weekly digest
+Date: Wed, 10 Mar 2021 09:00:00 +0000
+List-Unsubscribe: <mailto:unsubscribe@example.com>
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: Example Service <no-reply@accounts.example.net>
+Subject: Welcome to Example Service! Please verify your email
+Date: Thu, 15 Aug 2019 08:30:00 +0000
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: Example Service <security@example.net>
+Subject: =?UTF-8?B?5paw44GX44GE56uv5pyr44GL44KJ?=
+ =?UTF-8?B?44Ot44Kw44Kk44Oz44GM44GC44KK44G+44GX44Gf?=
+Date: Fri, 20 Dec 2019 23:59:59 +0000
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+
+From 1700000000000000000@xxx Mon Jan 01 00:00:00 +0000 2024
+X-Gmail-Labels: Inbox
+From: old-service@example.org
+Subject: =?UTF-8?B?6YCA5Lya5omL57aa44GN44GM5a6M5LqG44GX44G+44GX44Gf?=
+Date: Sat, 01 Jan 2022 00:00:00 +0900
+Content-Type: text/plain; charset=UTF-8
+
+This is a synthetic test message.
+From here on, the body continues.
+

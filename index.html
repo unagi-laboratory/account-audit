@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>登録サービス棚卸し</title>
+  </head>
+  <body>
+    <header>
+      <h1>登録サービス棚卸し</h1>
+      <p class="lead">
+        メールのエクスポート（mbox）から、過去に登録したWebサービスを一覧にします。
+        <strong>処理はすべてこのブラウザの中で行われ、データはどこにも送信されません。</strong>
+      </p>
+    </header>
+
+    <main>
+      <section class="input">
+        <label for="file" class="file-label">mbox ファイルを選択</label>
+        <input id="file" type="file" accept=".mbox,application/mbox,text/plain" />
+        <p class="hint">Googleテイクアウトで Gmail をエクスポートした .mbox ファイルを指定してください。ラベルを絞ってエクスポートしたものでも使えます。</p>
+        <progress id="progress" max="1" value="0" hidden></progress>
+        <p id="progress-text" class="progress-text" aria-live="polite"></p>
+      </section>
+
+      <section id="result" hidden>
+        <p id="summary"></p>
+        <div class="toolbar">
+          <input id="filter-text" type="search" placeholder="ドメイン・件名で絞り込み" aria-label="ドメイン・件名で絞り込み" />
+          <select id="filter-signal" aria-label="シグナルで絞り込み">
+            <option value="">すべてのシグナル</option>
+            <option value="signup">登録</option>
+            <option value="usage">利用</option>
+            <option value="withdrawal">退会</option>
+            <option value="newsletter">配信のみ</option>
+          </select>
+          <button id="export-csv" type="button">CSVで保存</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><button type="button" data-sort="domain">ドメイン</button></th>
+                <th><button type="button" data-sort="default">シグナル</button></th>
+                <th><button type="button" data-sort="count">件数</button></th>
+                <th><button type="button" data-sort="firstSeen">初回受信</button></th>
+                <th><button type="button" data-sort="lastSeen">最終受信</button></th>
+                <th>代表的な件名</th>
+                <th>ステータス</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        ソースコード: <a href="https://github.com/unagi-laboratory/account-audit" rel="noopener noreferrer">GitHub</a>
+        ・ 通信していないことの確かめ方は README を参照してください。
+      </p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
