@@ -10,25 +10,42 @@ import { toCsv } from './core/csv';
  * innerHTML は使わず textContent だけで DOM に入れる。
  */
 
-type Status = '' | 'withdraw' | 'keep' | 'withdrawn' | 'ignore';
-const STATUS_LABELS: Record<Status, string> = {
-  '': '未設定',
-  withdraw: '退会する',
-  keep: '残す',
-  withdrawn: '退会済み',
-  ignore: '対象外',
-};
 const SIGNALS: Signal[] = ['signup', 'usage', 'withdrawal', 'newsletter'];
 
-type SortKey = 'default' | 'domain' | 'count' | 'firstSeen' | 'lastSeen';
+type SortKey = 'domain' | 'score' | 'count' | 'firstSeen' | 'lastSeen' | 'subjects';
+type SortDir = 'asc' | 'desc';
+
+/** 見出しを初めてクリックしたときの向き。文字列は昇順、数値・日付は降順から */
+const FIRST_DIR: Record<SortKey, SortDir> = {
+  domain: 'asc',
+  score: 'desc',
+  count: 'desc',
+  firstSeen: 'desc',
+  lastSeen: 'desc',
+  subjects: 'asc',
+};
+
+const collator = new Intl.Collator('ja', { numeric: true, sensitivity: 'base' });
+
+/** 並べ替えの値。null は向きに関係なく末尾に置く */
+function sortValue(r: ServiceRow, key: SortKey): string | number | null {
+  switch (key) {
+    case 'domain':
+      return r.domain;
+    case 'subjects':
+      return r.sampleSubjects[0] ?? null;
+    default:
+      return r[key];
+  }
+}
 
 const state = {
   rows: [] as ServiceRow[],
-  status: new Map<string, Status>(),
   filterText: '',
   filterSignal: '' as Signal | '',
-  sortKey: 'default' as SortKey,
-  sortDesc: false,
+  // 初期状態はワーカーが返す既定順（アカウントの可能性が高い順）と同じ
+  sortKey: 'score' as SortKey,
+  sortDir: 'desc' as SortDir,
 };
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -63,21 +80,33 @@ function fmtBytes(n: number): string {
 
 function visibleRows(): ServiceRow[] {
   const q = state.filterText.toLowerCase();
-  let rows = state.rows.filter(
+  const rows = state.rows.filter(
     (r) =>
       (!q || r.domain.includes(q) || r.sampleSubjects.some((s) => s.toLowerCase().includes(q))) &&
       (!state.filterSignal || r.signals[state.filterSignal] > 0),
   );
-  if (state.sortKey !== 'default') {
-    const k = state.sortKey;
-    const dir = state.sortDesc ? -1 : 1;
-    rows = [...rows].sort((a, b) => {
-      const av = a[k] ?? 0;
-      const bv = b[k] ?? 0;
-      return (av < bv ? -1 : av > bv ? 1 : 0) * dir;
-    });
-  }
-  return rows;
+  const k = state.sortKey;
+  const dir = state.sortDir === 'asc' ? 1 : -1;
+  // Array.prototype.sort は安定ソートなので、同値の行は既定順のまま並ぶ
+  return [...rows].sort((a, b) => {
+    const av = sortValue(a, k);
+    const bv = sortValue(b, k);
+    if (av === bv) return 0;
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    const c = typeof av === 'string' && typeof bv === 'string' ? collator.compare(av, bv) : av < bv ? -1 : 1;
+    return c * dir;
+  });
+}
+
+function renderSortIndicators(): void {
+  document.querySelectorAll<HTMLButtonElement>('th button[data-sort]').forEach((btn) => {
+    const th = btn.closest('th')!;
+    const active = btn.dataset.sort === state.sortKey;
+    if (active) th.setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
+    else th.removeAttribute('aria-sort');
+    btn.querySelector('.sort-indicator')!.textContent = active ? (state.sortDir === 'asc' ? '▲' : '▼') : '';
+  });
 }
 
 function render(): void {
@@ -101,29 +130,17 @@ function render(): void {
     for (const s of r.sampleSubjects) subj.append(el('div', s));
     tr.append(subj);
 
-    const statusCell = el('td');
-    const select = el('select');
-    select.setAttribute('aria-label', `${r.domain} のステータス`);
-    for (const [value, label] of Object.entries(STATUS_LABELS)) {
-      const opt = el('option', label);
-      opt.value = value;
-      select.append(opt);
-    }
-    select.value = state.status.get(r.domain) ?? '';
-    select.addEventListener('change', () => state.status.set(r.domain, select.value as Status));
-    statusCell.append(select);
-    tr.append(statusCell);
 
     frag.append(tr);
   }
   tbody.replaceChildren(frag);
+  renderSortIndicators();
 }
 
 function exportCsv(): void {
-  const header = ['ドメイン', 'ステータス', '件数', '初回受信', '最終受信', ...SIGNALS.map((s) => SIGNAL_LABELS[s]), '代表的な件名'];
+  const header = ['ドメイン', '件数', '初回受信', '最終受信', ...SIGNALS.map((s) => SIGNAL_LABELS[s]), '代表的な件名'];
   const rows = visibleRows().map((r) => [
     r.domain,
-    STATUS_LABELS[state.status.get(r.domain) ?? ''],
     r.count,
     fmtDate(r.firstSeen),
     fmtDate(r.lastSeen),
@@ -158,7 +175,8 @@ function analyze(file: File): void {
         worker.terminate();
         fileInput.disabled = false;
         state.rows = msg.rows;
-        state.status.clear();
+        state.sortKey = 'score';
+        state.sortDir = 'desc';
         summary.textContent = `${msg.messages.toLocaleString()} 通のメールから ${msg.rows.length.toLocaleString()} 件の送信元ドメインを検出しました` +
           (msg.skipped ? `（送信元を判別できなかったメール: ${msg.skipped.toLocaleString()} 通）` : '');
         resultSection.hidden = false;
@@ -189,8 +207,11 @@ filterSignal.addEventListener('change', () => {
 document.querySelectorAll<HTMLButtonElement>('th button[data-sort]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const key = btn.dataset.sort as SortKey;
-    state.sortDesc = state.sortKey === key ? !state.sortDesc : key === 'count';
-    state.sortKey = key;
+    if (state.sortKey === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+    else {
+      state.sortKey = key;
+      state.sortDir = FIRST_DIR[key];
+    }
     render();
   });
 });
