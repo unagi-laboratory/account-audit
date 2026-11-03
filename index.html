@@ -41,13 +41,12 @@
           <table>
             <thead>
               <tr>
-                <th><button type="button" data-sort="domain">ドメイン</button></th>
-                <th><button type="button" data-sort="default">シグナル</button></th>
-                <th><button type="button" data-sort="count">件数</button></th>
-                <th><button type="button" data-sort="firstSeen">初回受信</button></th>
-                <th><button type="button" data-sort="lastSeen">最終受信</button></th>
-                <th>代表的な件名</th>
-                <th>ステータス</th>
+                <th class="col-domain"><button type="button" data-sort="domain">ドメイン<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                <th class="col-signals"><button type="button" data-sort="score">シグナル<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                <th><button type="button" data-sort="count">件数<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                <th><button type="button" data-sort="firstSeen">初回受信<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                <th><button type="button" data-sort="lastSeen">最終受信<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                <th><button type="button" data-sort="subjects">代表的な件名<span class="sort-indicator" aria-hidden="true"></span></button></th>
               </tr>
             </thead>
             <tbody id="rows"></tbody>
